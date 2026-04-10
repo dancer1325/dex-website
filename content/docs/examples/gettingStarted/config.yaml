@@ -1,0 +1,25 @@
+# templated
+issuer: "{{ .Env.DEX_ISSUER }}"
+
+storage:
+  type: sqlite3
+  config:
+    file: /var/dex/dex.db
+
+web:
+  http: 0.0.0.0:5556
+
+staticClients:
+- id: example-app
+  name: Example App
+  secret: "{{ .Env.DEX_CLIENT_SECRET }}"
+  redirectURIs:
+  - "{{ .Env.DEX_REDIRECT_URI }}"
+
+enablePasswordDB: true
+
+staticPasswords:
+- email: "{{ .Env.DEX_USER_EMAIL }}"
+  hash: "{{ .Env.DEX_USER_PASSWORD_HASH }}"
+  username: admin
+  userID: "08a8684b-db88-4b73-90a9-3cd1661f5466"

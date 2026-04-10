@@ -8,60 +8,74 @@ weight: 1010
 type: "docs"
 ---
 
-## Container image
+## ways to install + run
+### -- from -- container image
 
-Dex is primarily distributed as a container image, published to the following locations:
+* == 👀MAIN way👀
+* published |
+  - [ghcr.io/dexidp/dex](https://github.com/dexidp/dex/pkgs/container/dex)
+  - [docker.io/dexidp/dex](https://hub.docker.com/r/dexidp/dex/tags)
+* EXISTING variants
+  * `alpine`
+  * `distroless`
+* `dex serve <PATH_TO_CONFIGURATION>`
+  * way to run
 
-- [ghcr.io/dexidp/dex](https://github.com/dexidp/dex/pkgs/container/dex)
-- [docker.io/dexidp/dex](https://hub.docker.com/r/dexidp/dex/tags)
+### Helm chart
+* [here](https://github.com/dancer1325/dex-helm)
 
-2 variants (`alpine` and `distroless`) of container images are provided
-based on Alpine Linux and Distroless base images.
+### -- from -- source code
 
-A reference Kubernetes Helm chart for dex can be found at [charts.dexidp.io](https://charts.dexidp.io).
+* requirements
+  * install Go v1.19+
 
-## Building the dex binary
-
-To build dex from source code, install a working Go environment with version 1.19 or greater according to the [official documentation][go-setup].
-Then clone the repository and use `make` to compile the dex binary.
-
-```bash
-$ git clone https://github.com/dexidp/dex.git
-$ cd dex/
-$ make build
-```
+* steps
+  * | [source repo's host path](https://github.com/dancer1325/dex),
+    * `make build`
+      * generate "./bin"
+    * `./bin/dex serve examples/config-dev.yaml`
+  * | browser,
+    * http://127.0.0.1:5556/dex
+      * check it's running
 
 ## Configuration
 
-Dex exclusively pulls configuration options from a config file. Use the [example config][example-config] file found in the `examples/` directory to start an instance of dex with a sqlite3 data store, and a set of predefined OAuth2 clients.
+* 💡-- via -- a config file💡
+  * 1! way to configure Dex
 
-```bash
-./bin/dex serve examples/config-dev.yaml
-```
-
-The [example config][example-config] file documents many of the configuration options through inline comments. For extra config options, look at that file.
+* _Example:_ [here](https://github.com/dexidp/dex/blob/master/examples/config-dev.yaml)
 
 ### Templated configuration
 
-The default entrypoint for distributed container images utilize [gomplate][gomplate]
-to pre-process configuration files (`.tpl`, `.tmpl`, `.yaml`) passed as arguments.
-This enables templating any field from the environment, for example:
+* | [install -- via -- container images](#---from----container-image),
+  * any environment field can be templated | configuration file
+    * Reason:🧠default entrypoint
+      * pre-process configuration files (".tpl", ".tmpl", ".yaml") -- , via [gomplate](https://github.com/hairyhenderson/gomplate), passed as -- arguments
+      * _Example:_ if you use Docker -> `ENTRYPOINT`🧠
 
-```yaml
-secret: "{{ .Env.MY_SECRET_ENV }}"
-```
+## how to run Dex?
+* `./bin/dex serve <PATH_TO_CONFIGURATION_FILE>`
 
-See [gomplate docs][gomplate-docs] for templating syntax.
+## how to run a client?
 
-## Running a client
+* ⚠️requirements⚠️
+  * [run Dex](#ways-to-install--run)
 
-Dex operates like most other OAuth2 providers. Users are redirected from a client app to dex to login. Dex ships with an example client app (built with the `make examples` command), for testing and demos.
+* Dex's
+  * behaviour == MOST OTHER OAuth2 providers' behaviour
+    * == | client app | login users,
+      * they are redirected -- to -- Dex
+  * 👀built-in example client app👀
+    * | source repo, built -- via -- `make examples` command
+    * uses
+      * testing
+      * demos
+    * 's configuration's OAuth2 credentials
+      * == [examples/config-dev.yaml](https://github.com/dexidp/dex/blob/master/examples/config-dev.yaml)'s credentials
+    * if you want to run -> `./bin/example-app`
+      * query dex's [discovery endpoint](https://openid.net/specs/openid-connect-discovery-1_0-17.html#ProviderMetadata)
+      * determine the OAuth2 endpoints
 
-By default, the example client is configured with the same OAuth2 credentials defined in `examples/config-dev.yaml` to talk to dex. Running the example app will cause it to query dex's [discovery endpoint][oidc-discovery] and determine the OAuth2 endpoints.
-
-```bash
-./bin/example-app
-```
 
 Login to dex through the example app using the following steps.
 
@@ -75,15 +89,8 @@ Login to dex through the example app using the following steps.
 
 ## Further reading
 
-Dex is generally used as a building block to drive authentication for other apps. See [_"Writing apps that use Dex"_][using-dex] for an overview of instrumenting apps to work with dex.
+Check out the Documentation directory for further reading on setting up different storages,
+interacting with the dex API, intros for OpenID Connect, and logging in through other identity providers such as Google, GitHub, or LDAP.
 
-For a primer on using LDAP to back dex's user store, see the OpenLDAP [_"Getting started"_](/docs/connectors/ldap/#getting-started) example.
-
-Check out the Documentation directory for further reading on setting up different storages, interacting with the dex API, intros for OpenID Connect, and logging in through other identity providers such as Google, GitHub, or LDAP.
-
-[go-setup]: https://golang.org/doc/install
-[example-config]: https://github.com/dexidp/dex/blob/master/examples/config-dev.yaml
 [gomplate]: https://github.com/hairyhenderson/gomplate
 [gomplate-docs]: https://docs.gomplate.ca/
-[oidc-discovery]: https://openid.net/specs/openid-connect-discovery-1_0-17.html#ProviderMetadata
-[using-dex]: /docs//using-dex/

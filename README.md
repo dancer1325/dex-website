@@ -1,26 +1,38 @@
-# CNCF Hugo Starter
+# Dex website
 
-This repository contains a boilerplate static site generator setup for creating CNCF documentation projects. We strongly recommend using this setup (it helps us help you and your project!), but none of the technologies in the stack are strictly required.
+* -- based on -- CNCF Hugo Starter
+  * **[Hugo](https://gohugo.io/)**
+    * allows
+      * generating a static site
+  * **[Docsy](https://www.docsy.dev/)**
+    * provide
+      * documentation theme
+  * **[Netlify](https://www.netlify.com/)**
+    * allows, about a DNS,
+      * building
+      * hosting
 
-The starter uses the following:
-* **[Hugo](https://gohugo.io/)** as a static site generator
-* **[Docsy](https://www.docsy.dev/)** as a documentation theme
-* **[Netlify](https://www.netlify.com/)** for building, hosting, and DNS management
+## documentation
+* [here](layouts/index.md)
 
-## Running locally
+## how to run locally?
 
-Make sure you have [npm](https://www.npmjs.com/) and [yarn](https://yarnpkg.com/) installed. Clone this repository and run the following two commands in its directory:
+* TODO:
+Make sure you have [npm](https://www.npmjs.com/) and [yarn](https://yarnpkg.com/) installed
+* Clone this repository and run the following two commands in its directory:
 
 ```shell
 # Run the server locally
 make serve
 ```
 
-## Running on Netlify
+## how to run | Netlify?
 
-Netlify is a CI/CD build tool and hosting solution for (among other things) static sites. We **strongly** recommend using Netlify unless you have a good reason not to.
+Netlify is a CI/CD build tool and hosting solution for (among other things) static sites
+* We **strongly** recommend using Netlify unless you have a good reason not to.
 
-This repository comes with a pre-configured [`netlify.toml`](https://github.com/cncf/hugo-netlify-starter/blob/master/netlify.toml) file. To build to Netlify:
+This repository comes with a pre-configured [`netlify.toml`](https://github.com/cncf/hugo-netlify-starter/blob/master/netlify.toml) file
+* To build to Netlify:
 
 1. Go to [netlify.com](https://netlify.com) and sign up. We recommend signing up using a GitHub account.
 2. Click **New Site from Git**, and give Netlify access to your GitHub account.
