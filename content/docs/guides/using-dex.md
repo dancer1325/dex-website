@@ -7,21 +7,34 @@ toc: true
 weight: 1017
 ---
 
-Once you have dex up and running, the next step is to write applications that use dex to drive authentication. Apps that interact with dex generally fall into one of two categories:
+* requirements
+  * dex up & running
 
-1. Apps that request OpenID Connect ID tokens to authenticate users.
-    * Used for authenticating an end user.
-    * Must be web based.
-2. Apps that consume ID tokens from other apps.
-    * Needs to verify that a client is acting on behalf of a user.
+* goal
+  * write applications / drive authentication -- via -- Dex
+    * apps categories
+      1. Apps / request OpenID Connect ID tokens -- to -- authenticate users
+        * ⚠️requirements⚠️
+          * web based
+        * uses
+          * authenticate an end user
+        * == standard OAuth2 clients
+      2. Apps / consume ID tokens -- from -- OTHER apps
+        * uses
+          * verify that a client is acting -- on -- behalf of a user
+        * 's credentials == ID tokens
 
-The first category of apps are standard OAuth2 clients. Users show up at a website, and the application wants to authenticate those end users by pulling claims out of the ID token.
 
-The second category of apps consume ID tokens as credentials. This lets another service handle OAuth2 flows, then use the ID token retrieved from dex to act on the end user's behalf with the app. An example of an app that falls into this category is the [Kubernetes API server][api-server].
+* Users show up at a website, and the application wants to authenticate those end users by pulling claims out of the ID token.
+
+
+* This lets another service handle OAuth2 flows, then use the ID token retrieved from dex to act on the end user's behalf with the app
+* An example of an app that falls into this category is the [Kubernetes API server][api-server].
 
 ## Requesting an ID token from dex
 
-Apps that directly use dex to authenticate a user use OAuth2 code flows to request a token response. The exact steps taken are:
+Apps that directly use dex to authenticate a user use OAuth2 code flows to request a token response
+* The exact steps taken are:
 
 * User visits client app.
 * Client app redirects user to dex with an OAuth2 request.
@@ -42,7 +55,8 @@ The example app uses the following Go packages to perform the code flow:
 * [github.com/coreos/go-oidc][go-oidc]
 * [golang.org/x/oauth2][go-oauth2]
 
-First, client details should be present in the dex configuration. For example, we could register an app with dex with the following section:
+First, client details should be present in the dex configuration
+* For example, we could register an app with dex with the following section:
 
 ```yaml
 staticClients:
@@ -95,7 +109,9 @@ func handleRedirect(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-After dex verifies the user's identity it redirects the user back to the client app with a code that can be exchanged for an ID token. The ID token can then be parsed by the verifier created above. This immediately 
+After dex verifies the user's identity it redirects the user back to the client app with a code that can be exchanged for an ID token
+* The ID token can then be parsed by the verifier created above
+* This immediately
 
 ```go
 func handleOAuth2Callback(w http.ResponseWriter, r *http.Request) {
@@ -134,20 +150,28 @@ func handleOAuth2Callback(w http.ResponseWriter, r *http.Request) {
 
 ### State tokens
 
-The state parameter is an arbitrary string that dex will always return with the callback. It plays a security role, preventing certain kinds of OAuth2 attacks. Specifically it can be used by clients to ensure:
+The state parameter is an arbitrary string that dex will always return with the callback
+* It plays a security role, preventing certain kinds of OAuth2 attacks
+* Specifically it can be used by clients to ensure:
 
-* The user who started the flow is the one who finished it, by linking the user's session with the state token. For example, by setting the state as an HTTP cookie, then comparing it when the user returns to the app.
-* The request hasn't been replayed. This could be accomplished by associating some nonce in the state.
+* The user who started the flow is the one who finished it, by linking the user's session with the state token
+  * For example, by setting the state as an HTTP cookie, then comparing it when the user returns to the app.
+* The request hasn't been replayed
+  * This could be accomplished by associating some nonce in the state.
 
 A more thorough discussion of these kinds of best practices can be found in the [_"OAuth 2.0 Threat Model and Security Considerations"_][oauth2-threat-model] RFC.
 
 ## Consuming ID tokens
 
-Apps can also choose to consume ID tokens, letting other trusted clients handle the web flows for login. Clients pass along the ID tokens they receive from dex, usually as a bearer token, letting them act as the user to the backend service.
+Apps can also choose to consume ID tokens, letting other trusted clients handle the web flows for login
+* Clients pass along the ID tokens they receive from dex, usually as a bearer token, letting them act as the user to the backend service.
 
 ![Dex backend flow](/img/dex-backend-flow.png)
 
-To accept ID tokens as user credentials, an app would construct an OpenID Connect verifier similarly to the above example. The verifier validates the ID token's signature, ensures it hasn't expired, etc. An important part of this code is that the verifier only trusts the example app's client. This ensures the example app is the one who's using the ID token, and not another, untrusted client.
+To accept ID tokens as user credentials, an app would construct an OpenID Connect verifier similarly to the above example
+* The verifier validates the ID token's signature, ensures it hasn't expired, etc
+* An important part of this code is that the verifier only trusts the example app's client
+* This ensures the example app is the one who's using the ID token, and not another, untrusted client.
 
 ```go
 // Initialize a provider by specifying dex's issuer URL.

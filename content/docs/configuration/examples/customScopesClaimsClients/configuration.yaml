@@ -1,0 +1,21 @@
+# web app can generate an ID token -- on behalf of a -- CL tool
+staticClients:
+  - id: web-app
+    redirectURIs:
+      - 'https://web-app.example.com/callback'
+    name: 'Web app'
+    secret: web-app-secret
+    # secretEnv
+    #   ALTERNATIVE TO secret
+    #   allows: fetch the secret -- from an -- injected environment variable
+    # secretEnv: YOUR_INJECTED_SECRET
+
+  - id: cli-app
+    redirectURIs:
+      - 'https://cli-app.example.com/callback'
+    name: 'Command line tool'
+    secret: cli-app-secret
+    # trustedPeers
+    #   lets the web app issue ID tokens -- on -- its behalf
+    trustedPeers:
+      - web-app

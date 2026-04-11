@@ -9,43 +9,46 @@ type: "docs"
 weight: 1020
 ---
 
-This document attempts to provide a general overview of the [OpenID Connect protocol](https://openid.net/connect/), a flavor of OAuth2 that dex implements. While this document isn't complete, we hope it provides enough information to get users up and running.
+* goal
+  * [OpenID Connect protocol](https://openid.net/connect/)
 
-For an overview of custom claims, scopes, and client features implemented by dex, see [this document](/docs/configuration/custom-scopes-claims-clients).
+* OpenID Connect protocol
+  * == flavor of OAuth2 /
+    * Dex implements
 
 ## OAuth2
 
-OAuth2 should be familiar to anyone who's used something similar to a "Login
-with Google" button. In these cases an application has chosen to let an
-outside provider, in this case Google, attest to your identity instead of
-having you set a username and password with the app itself.
+* uses
+  * "Login with Google" button
 
-The general flow for server side apps is:
-
-1. A new user visits an application.
-1. The application redirects the user to Google.
-1. The user logs into Google, then is asked if it's okay to let the
-application view the user's profile, post on their behalf, etc.
-1. If the user clicks okay, Google redirects the user back to the application
-with a code.
-1. The application redeems that code with provider for a token that can be used
-to access the authorized actions, such as viewing a users profile or posting on
-their wall.
-
-In these cases, dex is acting as Google (called the "provider" in OpenID
-Connect) while clients apps redirect to it for the end user's identity.
+* | server side apps,
+  * general flow
+    1. NEW user visits an application
+    2. application redirects the user -- to -- Dex
+    3. user logs (-- via -- connectors) | Dex
+       * is asked if it's okay to let the application
+         * view the user's profile
+         * post on their behalf
+         * etc.
+    4. if the user clicks okay -> Dex redirects the user -- , with a code, back to the -- application
+    5. the application redeems that code with provider -- for a -- token
 
 ## ID Tokens
 
+TODO: clean with configuration/tokens.md
+
 Unfortunately the access token applications get from OAuth2 providers is
-completely opaque to the client and unique to the provider. The token you
+completely opaque to the client and unique to the provider
+* The token you
 receive from Google will be completely different from the one you'd get from
 Twitter or GitHub.
 
 OpenID Connect's primary extension of OAuth2 is an additional token returned in
-the token response called the ID Token. This token is a [JSON Web Token](
+the token response called the ID Token
+* This token is a [JSON Web Token](
 https://tools.ietf.org/html/rfc7519) signed by the OpenID Connect server, with
-well known fields for user ID, name, email, etc. A typical token response from
+well known fields for user ID, name, email, etc
+* A typical token response from
 an OpenID Connect looks like (with less whitespace):
 
 ```json
@@ -63,9 +66,11 @@ Pragma: no-cache
 }
 ```
 
-That ID Token is a JWT with three base64'd fields separated by dots. The first
+That ID Token is a JWT with three base64'd fields separated by dots
+* The first
 is a header, the second is a payload, and the third is a signature of the first
-two fields. When parsed we can see the payload of this value is.
+two fields
+* When parsed we can see the payload of this value is.
 
 ```json
 {
@@ -81,8 +86,10 @@ two fields. When parsed we can see the payload of this value is.
 This has a few interesting fields such as
 
 * The server that issued this token (`iss`).
-* The token's subject (`sub`). In this case a unique ID of the end user.
-* The token's audience (`aud`). The ID of the OAuth2 client this was issued for.
+* The token's subject (`sub`)
+  * In this case a unique ID of the end user.
+* The token's audience (`aud`)
+  * The ID of the OAuth2 client this was issued for.
 
 A real world token would have additional claims like the user's name, email, groups, etc.
 
@@ -140,9 +147,11 @@ $ curl http://127.0.0.1:5556/dex/.well-known/openid-configuration
 ```
 
 Importantly, we've discovered the authorization endpoint, token endpoint, and
-the location of the server's public keys. OAuth2 clients should be able to use
+the location of the server's public keys
+* OAuth2 clients should be able to use
 the token and auth endpoints immediately, while a JOSE library can be used to
-parse the keys. The keys endpoint returns a [JSON Web Key](
+parse the keys
+* The keys endpoint returns a [JSON Web Key](
 https://tools.ietf.org/html/rfc7517) Set of public keys that will look
 something like this:
 

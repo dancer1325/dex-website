@@ -10,3 +10,7 @@ menu: { main: { weight: 10 } }
 ## Architecture
 
 ![](../../static/img/architecture.png)
+
+* storage
+  * uses
+    * store the user's identity

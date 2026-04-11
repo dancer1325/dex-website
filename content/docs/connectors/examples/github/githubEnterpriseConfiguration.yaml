@@ -1,0 +1,49 @@
+connectors:
+  - type: github
+    # Required field for connector id.
+    id: github
+    # Required field for connector name.
+    name: GitHub
+    config:
+      # Required fields. Dex must be pre-registered with GitHub Enterprise
+      # to get the following values.
+      # Credentials can be string literals or pulled from the environment.
+      clientID: $GITHUB_CLIENT_ID
+      clientSecret: $GITHUB_CLIENT_SECRET
+      redirectURI: http://127.0.0.1:5556/dex/callback
+
+      # List of org and team names.
+      #  - If specified, a user MUST be a member of at least ONE of these orgs
+      #    and teams (if set) to authenticate with dex.
+      #  - Dex queries the following organizations for group information if the
+      #    "groups" scope is requested. Group claims are formatted as "(org):(team)".
+      #    For example if a user is part of the "engineering" team of the "coreos" org,
+      #    the group claim would include "coreos:engineering".
+      #  - If teams are specified, dex only returns group claims for those teams.
+      orgs:
+        - name: my-organization
+        - name: my-organization-with-teams
+          teams:
+            - red-team
+            - blue-team
+
+      # Flag which indicates that all the user's orgs and teams should be loaded.
+      # Only works if neither 'org' nor 'orgs' are specified in the config.
+      loadAllGroups: false
+
+      # How the team names are formatted
+      #  - Options: 'name' (default), 'slug', 'both'.
+      #  - Examples:
+      #    - 'name': 'acme:Site Reliability Engineers'
+      #    - 'slug': 'acme:site-reliability-engineers'
+      #    - 'both': 'acme:Site Reliability Engineers', 'acme:site-reliability-engineers'
+      teamNameField: slug
+
+      # Required ONLY for GitHub Enterprise.
+      # This is the Hostname of the GitHub Enterprise account listed on the
+      # management console. Ensure this domain is routable on your network.
+      hostName: git.example.com
+
+      # ONLY for GitHub Enterprise. Optional field.
+      # Used to support self-signed or untrusted CA root certificates.
+      rootCA: /etc/dex/ca.crt

@@ -6,9 +6,15 @@ draft: false
 toc: true
 weight: 1060
 ---
-Dex provides a range of configurable options that empower you to fine-tune and personalize various aspects of the authentication and user flow.
+
+* goal
+  * Dex's configurable options -- about --
+    * authentication flow
+    * user flow
 
 ## Flow Customization
+
+TODO:
 Customize OAuth2 settings to align with your authentication requirements.
 
 ```yaml
@@ -20,7 +26,8 @@ oauth2:
 ```
 
 ### Authentication flow
-* `responseTypes` - allows you to configure the desired auth flow (`Authorization Code Flow`, `Implicit Flow`, or `Hybrid Flow`) based on different values. See the table below for valid configuration options.
+* `responseTypes` - allows you to configure the desired auth flow (`Authorization Code Flow`, `Implicit Flow`, or `Hybrid Flow`)
+based on different values. See the table below for valid configuration options.
 
 | `responseTypes` value  | flow                    |
 |------------------------|-------------------------|
@@ -36,10 +43,10 @@ Examples of the different flows and their behavior can be found in the [official
 
 Customizing the user flow allows you to influence how users login into your application.
 
-* `skipApprovalScreen` - controls the need for user approval before sharing data with connected applications. If enabled, users must approve data sharing with every auth flow.
-  {{% alert color="info" %}}
-  This setting is not applicable when the request has the `approval_prompt=force` parameter. In this case, the approval screen is always shown.
-  {{% /alert %}}
+* `skipApprovalScreen` - controls the need for user approval before sharing data with connected applications
+  * If enabled, users must approve data sharing with every auth flow
+  * This setting is not applicable when the request has the `approval_prompt=force` parameter
+    * In this case, the approval screen is always shown.
 * `alwaysShowLoginScreen` - whether to always display the login screen. If only one authentication method is enabled, the default behavior is to go directly to it. For connected IdPs, this redirects the browser away from the application to upstream provider, such as the Google login page.
 
 ## Configurable Grants

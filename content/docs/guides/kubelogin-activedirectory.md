@@ -8,75 +8,76 @@ toc: true
 weight: 2140
 ---
 
+* goal
+  * how dex can work with kubelogin & Active Directory
+
 ## Overview
 
-kubelogin is helper tool for kubernetes and oidc integration.
-It makes easy to login Open ID Provider.
-This document describes how dex work with kubelogin and Active Directory.
+* kubelogin
+  * == helper tool / enable integrate kubernetes -- & -- oidc integration
+  * uses
+    * makes easier to login Open ID Provider
 
-examples/config-ad-kubelogin.yaml is sample configuration to integrate Active Directory and kubelogin.
+## Requirements
 
-## Precondition
+1. Active Directory OR LDAP / has Active Directory compatible schema
+   * _Example:_ samba ad
+   * enable TLS
 
-1. Active Directory
-You should have Active Directory or LDAP has Active Directory compatible schema such as samba ad.
-You may have user objects and group objects in AD. Please ensure TLS is enabled.
-
-2. Install kubelogin
-Download kubelogin from https://github.com/int128/kubelogin/releases.
-Install it to your terminal.
+2. install [kubelogin](https://github.com/int128/kubelogin/releases)
 
 ## Getting started
 
-### Generate certificate and private key
+### Generate certificate & private key
 
-Create OpenSSL conf req.conf as follow:
+* create OpenSSL conf
 
-```bash
-[req]
-req_extensions = v3_req
-distinguished_name = req_distinguished_name
+  ```bash, title=req.conf
+  [req]
+  req_extensions = v3_req
+  distinguished_name = req_distinguished_name
 
-[req_distinguished_name]
+  [req_distinguished_name]
 
-[ v3_req ]
-basicConstraints = CA:FALSE
-keyUsage = nonRepudiation, digitalSignature, keyEncipherment
-subjectAltName = @alt_names
+  [ v3_req ]
+  basicConstraints = CA:FALSE
+  keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+  subjectAltName = @alt_names
 
-[alt_names]
-DNS.1 = dex.example.com
-```
+  [alt_names]
+  # choose your favorite hostname
+  DNS.1 = dex.example.com
+  ```
 
-Please replace dex.example.com to your favorite hostname.
-Generate certificate and private key by following command.
+* Generate certificate + private key
 
-```bash
-$ openssl req -new -x509 -sha256 -days 3650 -newkey rsa:4096 -extensions v3_req -out openid-ca.pem -keyout openid-key.pem -config req.cnf -subj "/CN=kube-ca" -nodes
-$ ls openid*
-openid-ca.pem openid-key.pem
-```
+  ```bash
+  $ openssl req -new -x509 -sha256 -days 3650 -newkey rsa:4096 -extensions v3_req -out openid-ca.pem -keyout openid-key.pem -config req.cnf -subj "/CN=kube-ca" -nodes
+  $ ls openid*
+  openid-ca.pem openid-key.pem
+  ```
 
 ### Modify dex config
 
-Modify following host, bindDN and bindPW in examples/config-ad-kubelogin.yaml.
+* | Dex config,
+  * add
 
-```yaml
-connectors:
-- type: ldap
-  name: OpenLDAP
-  id: ldap
-  config:
-    host: ldap.example.com:636
+    ```yaml
+    connectors:
+    - type: ldap
+      name: OpenLDAP
+      id: ldap
+      config:
+        host: ldap.example.com:636
 
-    # No TLS for this setup.
-    insecureNoSSL: false
-    insecureSkipVerify: true
+        # No TLS for this setup.
+        insecureNoSSL: false
+        insecureSkipVerify: true
 
-    # This would normally be a read-only user.
-    bindDN: cn=Administrator,cn=users,dc=example,dc=com
-    bindPW: admin0!
-```
+        # This would normally be a read-only user.
+        bindDN: cn=Administrator,cn=users,dc=example,dc=com
+        bindPW: admin0!
+    ```
 
 ### Run dex
 
@@ -86,9 +87,11 @@ $ bin/dex serve examples/config-ad-kubelogin.yaml
 
 ### Configure kubernetes with oidc
 
+TODO:
 Copy `openid-ca.pem` to `/etc/ssl/certs/openid-ca.pem` on master node.
 
-Use the following flags to point your API server(s) at dex. `dex.example.com` should be replaced by whatever DNS name or IP address dex is running under.
+Use the following flags to point your API server(s) at dex
+`dex.example.com` should be replaced by whatever DNS name or IP address dex is running under.
 
 ```bash
 --oidc-issuer-url=https://dex.example.com:32000/dex
