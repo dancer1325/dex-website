@@ -1,0 +1,4 @@
+storage:
+  type: kubernetes
+  config:
+    inCluster: true

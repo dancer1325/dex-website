@@ -1,0 +1,4 @@
+storage:
+  type: sqlite3
+  config:
+    file: /var/dex/dex.db

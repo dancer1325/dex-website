@@ -1,0 +1,7 @@
+storage:
+  type: etcd
+  config:
+    # list of etcd endpoints we should connect to
+    endpoints:
+      - http://localhost:2379
+    namespace: my-etcd-namespace/

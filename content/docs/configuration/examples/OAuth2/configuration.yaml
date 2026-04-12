@@ -1,0 +1,8 @@
+oauth2:
+  grantTypes:
+    - "authorization_code"
+    - "refresh_token"
+    - "urn:ietf:params:oauth:grant-type:token-exchange"
+  responseTypes: [ "code" ]
+  skipApprovalScreen: true
+  alwaysShowLoginScreen: false

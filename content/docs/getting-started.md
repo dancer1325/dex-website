@@ -76,7 +76,7 @@ type: "docs"
       * query dex's [discovery endpoint](https://openid.net/specs/openid-connect-discovery-1_0-17.html#ProviderMetadata)
       * determine the OAuth2 endpoints
 
-
+TODO:
 Login to dex through the example app using the following steps.
 
 1. Navigate to the example app at http://localhost:5555/ in your browser.
@@ -87,10 +87,6 @@ Login to dex through the example app using the following steps.
 4. Approve the example app's request.
 5. See the resulting token the example app claims from dex.
 
-## Further reading
-
-Check out the Documentation directory for further reading on setting up different storages,
-interacting with the dex API, intros for OpenID Connect, and logging in through other identity providers such as Google, GitHub, or LDAP.
 
 [gomplate]: https://github.com/hairyhenderson/gomplate
 [gomplate-docs]: https://docs.gomplate.ca/

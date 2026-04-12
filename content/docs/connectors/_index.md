@@ -9,8 +9,6 @@ weight: 2000
 
 * [architecture](../_index.md)
 
-![](../../../static/img/dex-flow.png)
-
 * clients
   * SOME
     * need refresh token functionality
@@ -32,23 +30,23 @@ weight: 2000
       * return [group membership](../configuration/custom-scopes-claims-clients.md#scopes) claims
   * implemented connectors
 
-| Name                                                 | supports refresh tokens | supports groups claim | supports preferred_username claim | status  | notes |
-|------------------------------------------------------|-------------------------|-----------------------|-----------------------------------|---------| ----- |
-| [LDAP](/docs/connectors/ldap/)                       | yes                     | yes                   | yes                               | stable  | |
-| [GitHub](/docs/connectors/github/)                   | yes                     | yes                   | yes                               | stable  | |
-| [SAML 2.0](/docs/connectors/saml/)                   | no                      | yes                   | no                                | stable  |
-| [GitLab](/docs/connectors/gitlab/)                   | yes                     | yes                   | yes                               | beta    | |
-| [OpenID Connect](/docs/connectors/oidc/)             | yes                     | yes                   | yes                               | beta    | Includes Salesforce, Azure, etc. |
-| [OAuth 2.0](/docs/connectors/oauth/)                 | no                      | yes                   | yes                               | alpha   |
-| [Google](/docs/connectors/google/)                   | yes                     | yes                   | yes                               | alpha   | |
-| [LinkedIn](/docs/connectors/linkedin/)               | yes                     | no                    | no                                | beta    | |
-| [Microsoft](/docs/connectors/microsoft/)             | yes                     | yes                   | no                                | beta    | |
-| [AuthProxy](/docs/connectors/authproxy/)             | no                      | no                    | no                                | alpha   | Authentication proxies such as Apache2 mod_auth, etc. |
-| [Bitbucket Cloud](/docs/connectors/bitbucketcloud/)  | yes                     | yes                   | no                                | alpha   | |
-| [OpenShift](/docs/connectors/openshift/)             | no                      | yes                   | no                                | stable  | |
-| [Atlassian Crowd](/docs/connectors/atlassian-crowd/) | yes                     | yes                   | yes *                             | beta    | preferred_username claim must be configured through config |
-| [Gitea](/docs/connectors/gitea/)                     | yes                     | no                    | yes                               | alpha   | |
-| [OpenStack Keystone](/docs/connectors/keystone/)     | yes                     | yes                   | no                                | alpha   |  |
+| Name                                                | supports refresh tokens | supports groups claim | supports preferred_username claim | status  | notes |
+|-----------------------------------------------------|-------------------------|-----------------------|-----------------------------------|---------| ----- |
+| [LDAP](ldap)                       | yes                     | yes                   | yes                               | stable  | |
+| [GitHub](github)                  | yes                     | yes                   | yes                               | stable  | |
+| [SAML 2.0](saml)                  | no                      | yes                   | no                                | stable  |
+| [GitLab](gitlab)                  | yes                     | yes                   | yes                               | beta    | |
+| [OpenID Connect](oidc)            | yes                     | yes                   | yes                               | beta    | Includes Salesforce, Azure, etc. |
+| [OAuth 2.0](oauth)                | no                      | yes                   | yes                               | alpha   |
+| [Google](google)                  | yes                     | yes                   | yes                               | alpha   | |
+| [LinkedIn](linkedin)              | yes                     | no                    | no                                | beta    | |
+| [Microsoft](microsoft)            | yes                     | yes                   | no                                | beta    | |
+| [AuthProxy](authproxy)            | no                      | no                    | no                                | alpha   | Authentication proxies such as Apache2 mod_auth, etc. |
+| [Bitbucket Cloud](bitbucketcloud) | yes                     | yes                   | no                                | alpha   | |
+| [OpenShift](openshift)            | no                      | yes                   | no                                | stable  | |
+| [Atlassian Crowd](atlassian-crowd) | yes                     | yes                   | yes *                             | beta    | preferred_username claim must be configured through config |
+| [Gitea](gitea)                    | yes                     | no                    | yes                               | alpha   | |
+| [OpenStack Keystone](keystone)    | yes                     | yes                   | no                                | alpha   |  |
 
 * status
   * Stable

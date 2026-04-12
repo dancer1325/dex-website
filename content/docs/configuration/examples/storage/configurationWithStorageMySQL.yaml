@@ -1,0 +1,9 @@
+storage:
+  type: mysql
+  config:
+    database: dex_db
+    user: dex
+    password: 66964843358242dbaaa7778d8477c288
+    ssl:
+      mode: custom
+      caFile: /etc/dex/mysql.ca

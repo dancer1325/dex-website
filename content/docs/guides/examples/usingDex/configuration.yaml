@@ -1,0 +1,7 @@
+staticClients:
+  - id: example-app
+    secret: example-app-secret
+    name: 'Example App'
+    # Where the app will be running.
+    redirectURIs:
+      - 'http://127.0.0.1:5555/callback'

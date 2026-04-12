@@ -12,161 +12,122 @@ weight: 1017
 
 * goal
   * write applications / drive authentication -- via -- Dex
-    * apps categories
-      1. Apps / request OpenID Connect ID tokens -- to -- authenticate users
-        * ⚠️requirements⚠️
-          * web based
-        * uses
-          * authenticate an end user
-        * == standard OAuth2 clients
-      2. Apps / consume ID tokens -- from -- OTHER apps
-        * uses
-          * verify that a client is acting -- on -- behalf of a user
-        * 's credentials == ID tokens
 
+* apps categories
+  1. [apps / request OpenID Connect ID tokens](#apps--request-an-id-token----from----dex)
+    * ⚠️requirements⚠️
+      * web based
+    * uses
+      * authenticate an end user
+    * == standard OAuth2 clients
+  2. [apps / consume ID tokens -- from -- OTHER apps](#apps--consume-id-tokens----from----other-apps)
+    * uses
+      * verify that a client is acting -- on -- behalf of a user
+    * 's credentials == ID tokens
+    * _Example:_ [Kubernetes API server](https://kubernetes.io/docs/reference/access-authn-authz/authentication/#openid-connect-tokens)
 
-* Users show up at a website, and the application wants to authenticate those end users by pulling claims out of the ID token.
+```mermaid
+flowchart LR
+    U([User]) -->|visits| A1[App cat.1\nOAuth2 client]
+    A1 -->|OAuth2 flow| Dex
+    Dex -->|ID token| A1
+    A1 -->|reads claims\nemail, groups...| A1
 
-
-* This lets another service handle OAuth2 flows, then use the ID token retrieved from dex to act on the end user's behalf with the app
-* An example of an app that falls into this category is the [Kubernetes API server][api-server].
-
-## Requesting an ID token from dex
-
-Apps that directly use dex to authenticate a user use OAuth2 code flows to request a token response
-* The exact steps taken are:
-
-* User visits client app.
-* Client app redirects user to dex with an OAuth2 request.
-* Dex determines user's identity.
-* Dex redirects user to client with a code.
-* Client exchanges code with dex for an id_token.
-
-![Dex flow](/img/dex-flow.png)
-
-The dex repo contains a small [example app][example-app] as a working, self contained app that performs this flow.
-
-The rest of this section explores the code sections which help explain how to implement this logic in your own app.
-
-### Configuring your app
-
-The example app uses the following Go packages to perform the code flow:
-
-* [github.com/coreos/go-oidc][go-oidc]
-* [golang.org/x/oauth2][go-oauth2]
-
-First, client details should be present in the dex configuration
-* For example, we could register an app with dex with the following section:
-
-```yaml
-staticClients:
-- id: example-app
-  secret: example-app-secret
-  name: 'Example App'
-  # Where the app will be running.
-  redirectURIs:
-  - 'http://127.0.0.1:5555/callback'
+    A1 -->|bearer token\nID token| A2[App cat.2]
+    A2 -->|verifies token signature| A2
+    A2 -->|acts on behalf of user| A2
 ```
 
-In this case, the Go code would be configured as:
+# apps categories
+## apps / request -- , from Dex, -- an ID token
 
-```go
-// Initialize a provider by specifying dex's issuer URL.
-provider, err := oidc.NewProvider(ctx, "https://dex-issuer-url.com")
-if err != nil {
-    // handle error
-}
+```mermaid
+sequenceDiagram
+    actor User
+    participant App as Client App
+    participant Dex
+    participant IdP as Upstream IdP<br/>(GitHub, LDAP, etc.)
 
-// Configure the OAuth2 config with the client values.
-oauth2Config := oauth2.Config{
-    // client_id and client_secret of the client.
-    ClientID:     "example-app",
-    ClientSecret: "example-app-secret",
+    User->>App: visits
+    App->>User: redirect to Dex (OAuth2 request)
+    User->>Dex: follows redirect
 
-    // The redirectURL.
-    RedirectURL: "http://127.0.0.1:5555/callback",
+    Dex->>User: show login screen
+    User->>Dex: credentials
 
-    // Discovery returns the OAuth2 endpoints.
-    Endpoint: provider.Endpoint(),
+    Dex->>IdP: verify identity
+    IdP-->>Dex: identity confirmed
 
-    // "openid" is a required scope for OpenID Connect flows.
-    //
-    // Other scopes, such as "groups" can be requested.
-    Scopes: []string{oidc.ScopeOpenID, "profile", "email", "groups"},
-}
+    Dex->>User: redirect to App (with code)
+    User->>App: follows redirect (code)
 
-// Create an ID token parser.
-idTokenVerifier := provider.Verifier(&oidc.Config{ClientID: "example-app"})
+    App->>Dex: exchange code for id_token
+    Dex-->>App: id_token
+
+    App->>App: read claims → user authenticated
 ```
 
-The HTTP server should then redirect unauthenticated users to dex to initialize the OAuth2 flow.
+* [Dex example app](https://github.com/dexidp/dex/tree/master/examples/example-app)
+  * built-in | dex repo
+  * == client app /
+    * performs this flow
+  * Go packages / are used
+    * [go-oidc](https://godoc.org/github.com/coreos/go-oidc)
+    * [go-oauth2](https://godoc.org/golang.org/x/oauth2)
 
-```go
-// handleRedirect is used to start an OAuth2 flow with the dex server.
-func handleRedirect(w http.ResponseWriter, r *http.Request) {
-    state := newState()
-    http.Redirect(w, r, oauth2Config.AuthCodeURL(state), http.StatusFound)
-}
-```
+* goal
+  * how to implement logic | your OWN client app
 
-After dex verifies the user's identity it redirects the user back to the client app with a code that can be exchanged for an ID token
-* The ID token can then be parsed by the verifier created above
-* This immediately
+### how to configure your client app?
 
-```go
-func handleOAuth2Callback(w http.ResponseWriter, r *http.Request) {
-    state := r.URL.Query().Get("state")
-
-    // Verify state.
-
-    oauth2Token, err := oauth2Config.Exchange(ctx, r.URL.Query().Get("code"))
-    if err != nil {
-        // handle error
-    }
-
-    // Extract the ID Token from OAuth2 token.
-    rawIDToken, ok := oauth2Token.Extra("id_token").(string)
-    if !ok {
-        // handle missing token
-    }
-
-    // Parse and verify ID Token payload.
-    idToken, err := idTokenVerifier.Verify(ctx, rawIDToken)
-    if err != nil {
-        // handle error
-    }
-
-    // Extract custom claims.
-    var claims struct {
-        Email    string   `json:"email"`
-        Verified bool     `json:"email_verified"`
-        Groups   []string `json:"groups"`
-    }
-    if err := idToken.Claims(&claims); err != nil {
-        // handle error
-    }
-}
-```
+* | Dex configuration,
+  * specify `staticClients`
+* add code
 
 ### State tokens
 
-The state parameter is an arbitrary string that dex will always return with the callback
-* It plays a security role, preventing certain kinds of OAuth2 attacks
-* Specifically it can be used by clients to ensure:
+* state parameter
+  * arbitrary `string` / Dex will always return -- with the -- callback
+  * allows
+    * preventing certain kinds of OAuth2 attacks
+  * uses
+    * by clients to ensure
+      * user / started the flow == user / finished it
+        * link the user's session -- with the -- state token
+        * steps
+          * set state == HTTP cookie
+          * | user return to the app, compare it
 
-* The user who started the flow is the one who finished it, by linking the user's session with the state token
-  * For example, by setting the state as an HTTP cookie, then comparing it when the user returns to the app.
-* The request hasn't been replayed
-  * This could be accomplished by associating some nonce in the state.
+```mermaid
+sequenceDiagram
+    actor User
+    participant App as Client App
+    participant Dex
 
-A more thorough discussion of these kinds of best practices can be found in the [_"OAuth 2.0 Threat Model and Security Considerations"_][oauth2-threat-model] RFC.
+    User->>App: click "Login"
+    App->>App: generate random state ("abc123")
+    App->>User: set cookie (state="abc123")
+    App->>User: redirect to Dex ?state=abc123
 
-## Consuming ID tokens
+    User->>Dex: authenticates
+    Dex->>User: redirect to /callback?code=xyz&state=abc123
 
-Apps can also choose to consume ID tokens, letting other trusted clients handle the web flows for login
-* Clients pass along the ID tokens they receive from dex, usually as a bearer token, letting them act as the user to the backend service.
+    User->>App: /callback?code=xyz&state=abc123
+    App->>App: compare state from URL ("abc123") vs state from cookie ("abc123")
+    Note over App: match ✅ → legitimate flow
+    Note over App: mismatch ❌ → reject (possible attack)
+```
 
-![Dex backend flow](/img/dex-backend-flow.png)
+* [OAuth 2.0 Threat Model and Security Considerations](https://tools.ietf.org/html/rfc6819)
+
+## apps / consume ID tokens -- from -- OTHER apps
+
+TODO: 
+letting other trusted clients handle the web flows for login
+* Clients pass along the ID tokens they receive from dex, usually as a bearer token,
+letting them act as the user to the backend service.
+
+![Dex backend flow](../../../static/img/dex-backend-flow.png)
 
 To accept ID tokens as user credentials, an app would construct an OpenID Connect verifier similarly to the above example
 * The verifier validates the ID token's signature, ensures it hasn't expired, etc
@@ -213,10 +174,4 @@ func authorize(ctx context.Context, bearerToken string) (*user, error) {
 }
 ```
 
-[api-server]: https://kubernetes.io/docs/reference/access-authn-authz/authentication/#openid-connect-tokens
 [dex-flow]: img/dex-flow.png
-[dex-backend-flow]: img/dex-backend-flow.png
-[example-app]: https://github.com/dexidp/dex/tree/master/examples/example-app
-[oauth2-threat-model]: https://tools.ietf.org/html/rfc6819
-[go-oidc]: https://godoc.org/github.com/coreos/go-oidc
-[go-oauth2]: https://godoc.org/golang.org/x/oauth2
