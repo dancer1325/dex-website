@@ -14,9 +14,16 @@ weight: 1013
     * 👀Dex's primary feature👀
   * == 👀[JSON Web Tokens](https://jwt.io/)👀 /
     * signed -- by -- Dex
-    * contained | OAuth2 response
+    * ⚠️contained | OAuth2 response⚠️
     * contain [standard claims](https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims)
     * attest the end user's identity
+  * == `base64First.base64Second.base64Third`
+    * `base64First`
+      * == header
+    * `base64Second`
+      * == payload
+    * `base64Third`
+      * == signature of (`base64First`, `base64Second`)
   * _Example:_
 
     ```bash
@@ -41,6 +48,14 @@ weight: 1013
       "name": "Jane Doe"
       }
       ```
+      * `iss`
+        * == server / issued this token
+      * `sub`
+        * == token's subject
+        * == end user's UNIQUE ID
+      * `aud`
+        * == token's audience
+          * == OAuth2 client ID / this was issued for
 
   * uses
     * by other services -- as -- service-to-service credentials

@@ -1,0 +1,27 @@
+### GET -- Discovery mechanism
+## GOT ALL NEXT AVAILABLE endpoints
+GET http://127.0.0.1:5556/dex/.well-known/openid-configuration
+
+
+### authorization_endpoint
+## TODO: client_id
+GET http://127.0.0.1:5556/dex/auth
+
+### token_endpoint
+## TODO: invalid_request
+GET http://127.0.0.1:5556/dex/token
+
+### jwks_uri
+GET http://127.0.0.1:5556/dex/keys
+
+### userinfo_endpoint
+## TODO: Invalid bearer token
+GET http://127.0.0.1:5556/dex/userinfo
+
+### device_authorization_endpoint
+## TODO: Invalid device code request type
+GET http://127.0.0.1:5556/dex/device/code
+
+### introspection_endpoint
+## TODO: The POST body can not be empty
+POST http://127.0.0.1:5556/dex/token/introspect
