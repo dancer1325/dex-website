@@ -8,8 +8,6 @@ toc: true
 weight: 1013
 ---
 
-## Overview
-
 * ID Tokens
   * == 💡OAuth2 extension💡 /
     * introduced -- by -- OpenID Connect
@@ -53,134 +51,56 @@ weight: 1013
 
 ## Refresh tokens
 
-TODO:
-Refresh tokens are credentials used to obtain access tokens
-* Refresh tokens are issued to the client by the authorization server and are used to obtain
-a new id token when the current id token becomes invalid or expires
-* Issuing a refresh token is optional and is provided by passing `offline_access` scope to Dex server.
+* Refresh tokens
+  * == credentials /
+    * uses
+      * obtain NEW id tokens | CURRENT id token becomes invalid OR expires
+    * are rotated
+      * == [refresh_token rotation](https://tools.ietf.org/html/rfc6819#section-5.2.2.3)
+      * == / EACH id token refresh, issue NEW refresh token
+        * -- to the -- client
+        * -- by the -- authorization server
+      * allows
+        * prevents someone stealing it
+  * ⚠️OPTIONAL⚠️
+    * if you want it -> passes `offline_access` scope -- to -- Dex server
+  * _Example of server response / contains refresh token:_
 
-__NOTE__: Some connectors do not support `offline_access` scope
-* You can find out which connectors support refresh tokens by looking into the [_connectors list_][connectors].
+    ```json
+    {
+     "access_token": "eyJhbGciOiJSUzI1N...",
+     "token_type": "Bearer",
+     "refresh_token": "lxzzsvasxho5exvwkfa5zhefl",
+     "expires_in": 3600,
+     "id_token": "eyJhbGciO..."
+    }
+    ```
 
-Example of a server response with refresh token:
-```json
-{
- "access_token": "eyJhbGciOiJSUzI1N...",
- "token_type": "Bearer",
- "refresh_token": "lxzzsvasxho5exvwkfa5zhefl",
- "expires_in": 3600,
- "id_token": "eyJhbGciO..."
-}
-```
+### how to configure?
 
-__NOTE__: For every refresh of an id token, Dex issues a new refresh token
-* This security measure is called _refresh token rotation_
-and prevents someone stealing it
-* The idea is described in detail in the corresponding [RFC][rfc6819-5.2.2.3].
-
-## Expiration and rotation settings
-
-Dex has a section in the config file where you can specify expiration and rotation settings for id tokens and refresh tokens.
-__NOTE__: All duration options should be set in the format: number + time unit (s, m, h), e.g., `10m`.
-
-* `expiry` - section for various expiration settings, including token settings:
-  * `idTokens` - the lifetime of if tokens. It is preferable to use short-lived id tokens, e.g., 10 minutes.
-  * `authRequests` - the time frame in which users can exchange a code for an access or id token.
-  * `deviceRequests` - the time frame in which users can authorize a device to receive an access or id token.
-  * `signingKeys` - the period of time after which the signing keys are rotated. It is recommended to rotate keys regularly. If the `idTokens` lifetime exceeds, public parts of signing keys will be kept for validation for the extra time.
-  * `refreshTokens` - section for various refresh token settings:
-    * `validIfNotUsedFor` - invalidate a refresh token if it is not used for a specified amount of time.
-    * `absoluteLifetime` - a stricter variant of the previous option, absolute lifetime of a refresh token. It forces users to reauthenticate and obtain a new refresh token.
-    * `disableRotation` - completely disables every-request rotation. The user will also have to specify one of the previous refresh token options to keep refresh tokens secure when toggling this.
-    * `reuseInterval` - allows getting the same refresh token from refresh endpoint within a specified interval, but only if the user's request contains the previous refresh token.
-
-__NOTE__: `disableRotation` and `reuseInterval` options help effectively deal with network lags, concurrent requests, and so on in tradeoff for security
-* Use them with caution.
+* | Dex's configuration file
+  * `.expiry`
 
 ## Token signing configuration
 
-Dex provides flexible token signing options through the `signer` configuration section
-* You can choose between a local signer or integrate with Vault-compatible APIs for centralized key management.
+* | Dex's configuration file
+  * `.signer`
+    * [interface](https://github.com/dancer1325/dex/blob/master/server/signer/signer.go)
+
+* ALLOWED types
+  * [local signer](#local-signer)
+  * [Vault-compatible signer](#vault-compatible-signer)
 
 ### Local signer
 
-The local signer uses keys managed by Dex's storage backend with automatic rotation
-* This is the default option for simple deployments.
-
-* `type` - set to `local` to use local signing
-* `config` - configuration section for local signer:
-  * `keysRotationPeriod` - (required) the period after which signing keys are rotated (e.g., `6h`, `24h`)
-
-**Supported signing algorithms (not configurable):**
-
-* `RS256` (RSA with SHA-256)
-
-Example configuration:
-```yaml
-signer:
-  type: local
-  config:
-    keysRotationPeriod: 6h
-```
+* [configuration](https://github.com/dancer1325/dex/blob/master/server/signer/local.go)
+* use cases
+  * simple deployments
 
 ### Vault-compatible signer
 
-For enhanced security and centralized key management
-* This allows you to use HashiCorp Vault or OpenBao for signing operations without storing keys locally.
-
-* `type` - set to `vault` to use Vault-compatible API
-* `config` - configuration section for Vault signer:
-  * `keyName` - (required) the key identifier in Vault/OpenBao to use for signing (e.g., `dex/signing-key`)
-  * `addr` - Vault/OpenBao server address (optional, can be set via `VAULT_ADDR` environment variable)
-  * `token` - authentication token for Vault/OpenBao (optional, can be set via `VAULT_TOKEN` environment variable)
-
-**Supported signing algorithms:**
-
-* `RS256` (RSA with SHA-256)
-* `ES256` (ECDSA with SHA-256)
-* `ES384` (ECDSA with SHA-384)
-* `ES512` (ECDSA with SHA-512)
-* `EdDSA` (Edwards-curve Digital Signature Algorithm)
-
-The signing algorithm is determined by the key type configured in Vault/OpenBao's Transit backend.
-
-{{% alert title="Note" color="primary" %}}
-Only the `keyName` parameter is required
-* The `addr` and `token` can be provided through environment variables, making it easier to manage sensitive credentials without exposing them in configuration files.
-{{% /alert %}}
-
-Example configuration:
-```yaml
-signer:
-  type: vault
-  config:
-    keyName: dex/signing-key
-    addr: http://localhost:8200
-    token: test-token
-```
-
-Using environment variables:
-```yaml
-signer:
-  type: vault
-  config:
-    keyName: dex/signing-key
-```
-
-With environment variables set:
-```bash
-export VAULT_ADDR=https://vault.example.com:8200
-export VAULT_TOKEN=your-vault-token
-```
-
-This approach ensures that signing keys never leave your Vault/OpenBao server, providing better security and auditability of key operations.
-
-{{% alert title="Note" color="primary" %}}
-Dex supports Vault-compatible APIs through [OpenBao API v2 integration package](https://pkg.go.dev/github.com/openbao/openbao/api/v2).
-
-Integration tests for Dex guarantee compatibility with Vault, but it may change in the future.
-{{% /alert %}}
-
-[connectors]: /docs/connectors
-[openbao]: https://pkg.go.dev/github.com/openbao/openbao/api/v2
-[rfc6819-5.2.2.3]: https://tools.ietf.org/html/rfc6819#section-5.2.2.3
+* supported -- through -- [OpenBao API v2 integration package](https://pkg.go.dev/github.com/openbao/openbao/api/v2)
+* [configuration](https://github.com/dancer1325/dex/blob/master/server/signer/vault.go)
+* allows
+  * signing operations -- through -- HashiCorp Vault OR OpenBao
+    * WITHOUT storing keys LOCALLY

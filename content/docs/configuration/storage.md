@@ -58,10 +58,10 @@ weight: 1050
 * deprecated
   * Dex [v2.17.0-](https://github.com/dexidp/dex/tree/v2.17.0)
 
-TODO:
-If you are currently running dex using TPRs, you will need to [migrate to CRDs](https://github.com/dexidp/dex/blob/v2.17.0/Documentation/storage.md#migrating-from-tprs-to-crds)
-before you upgrade to a post v2.17 dex
-*  The script mentioned in the instructions can be [found here](https://github.com/dexidp/dex/blob/v2.17.0/scripts/dump-tprs)
+* migration
+  * steps
+    * [migrate to CRDs](https://github.com/dexidp/dex/blob/v2.17.0/Documentation/storage.md#migrating-from-tprs-to-crds)
+    * upgrade Dex -- to a -- post v2.17
 
 ### how to configure?
 
@@ -128,28 +128,23 @@ before you upgrade to a post v2.17 dex
 
 ## how to add a NEW storage options?
 
-TODO:
-Each storage implementation bears a large ongoing maintenance cost and needs to be updated every time a feature requires storing a new type
-* Bugs often require in depth knowledge of the backing software, and much of this work will be done by developers who are not the original author
-* Changes to dex which add new storage implementations require a strong use case to be considered for inclusion.
+* cons
+  * large ongoing maintenance cost
+  * depth knowledge -- of the -- backing software
 
-### New storage option references
+* requirements
+  * strong use case
+    * Reason:🧠otherwise, NOT considered🧠
+  * Integration testing setups (Travis & developer workstations)
+  * Transactional requirements: atomic deletes, updates, etc.
+  * Is there a Go client?
 
-Those who still want to construct a proposal for a new storage should review the following packages:
+### references
 
-* `github.com/dexidp/dex/storage`: Interface definitions which the storage must implement
-  * __NOTE:__ This package is not stable.
-* `github.com/dexidp/dex/storage/conformance`: Conformance tests which storage implementations must pass.
-
-### New storage option requirements
-
-Any proposal to add a new implementation must address the following:
-
-* Integration testing setups (Travis and developer workstations).
-* Transactional requirements: atomic deletes, updates, etc.
-* Is there an established and reasonable Go client?
-
-[issues-transaction-tests]: https://github.com/dexidp/dex/issues/600
-[k8s-api]: https://github.com/kubernetes/kubernetes/blob/master/docs/devel/api-conventions.md#concurrency-control-and-consistency
-[psql-conn-options]:
-[mysql-conn-options]: https://github.com/go-sql-driver/mysql#tls
+* `github.com/dexidp/dex/storage`
+  * == interface definitions /
+    * storage MUST implement
+    * ❌NOT stable❌
+* `github.com/dexidp/dex/storage/conformance`
+  * == conformance tests /
+    * storage implementations MUST pass

@@ -1,0 +1,4 @@
+signer:
+  type: local
+  config:
+    keysRotationPeriod: 6h

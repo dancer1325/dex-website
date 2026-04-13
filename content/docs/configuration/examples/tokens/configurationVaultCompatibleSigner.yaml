@@ -1,0 +1,14 @@
+signer:
+  type: vault
+  config:
+    keyName: dex/signing-key
+
+    # ALTERNATIVE to
+    #   `VAULT_ADDR` environment variable
+    #       == export VAULT_ADDR=https://vault.example.com:8200
+    addr: http://localhost:8200
+
+    # ALTERNATIVE to
+    #   `VAULT_TOKEN` environment variable
+    #       == export VAULT_TOKEN=your-vault-token
+    token: test-token
