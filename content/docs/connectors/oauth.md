@@ -9,7 +9,8 @@ weight: 2055
 
 ## Overview
 
-Dex users can make use of this connector to work with standards-compliant [OAuth 2.0](https://oauth.net/2/) authorization providers, in case those authorization providers are not already in the Dex connectors list.
+Dex users can make use of this connector to work with standards-compliant [OAuth 2.0](https://oauth.net/2/) authorization providers,
+in case those authorization providers are not already in the Dex connectors list.
 
 ## Configuration
 
