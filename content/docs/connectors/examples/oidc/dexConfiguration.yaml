@@ -37,6 +37,7 @@ connectors:
 
       # basicAuthUnsupported: true
 
+      # TODO: enable groups
       # scopes:
       #  - profile
       #  - email
@@ -49,6 +50,7 @@ connectors:
       # allowedGroups:
       #  - <value>
 
+      # TODO: enable it
       # getUserInfo: true
 
       # userIDKey: nickname
@@ -91,9 +93,9 @@ connectors:
       # tokenURL: ""
       # authURL: ""
 
+# if false OR NOT specified -> disable "Login with Email"
+# enablePasswordDB: true
 
-enablePasswordDB: true
-#
 #staticPasswords:
 #  - email: "admin@example.com"
 #    # password  == password
