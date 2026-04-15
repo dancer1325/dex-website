@@ -51,14 +51,20 @@ docker run -p 5556:5556 \
 ## Dex's behaviour == MOST OTHER OAuth2 providers' behaviour
 ### == | client app | login users, they are redirected -- to -- Dex
 * TODO:
+
 ## built-in example client app
 ### | source repo, built -- via -- `make examples` command
 * | source repo, `make examples`
   * check the logs
-### 's configuration's OAuth2 credentials
+### 's configuration's OAuth2 credentials == [examples/config-dev.yaml](https://github.com/dexidp/dex/blob/master/examples/config-dev.yaml)'s credentials
 TODO:
 ### if you want to run -> `./bin/example-app`
 * | source code repo, `./bin/example-app`
-
-
-# TODO:
+#### query Dex's discovery endpoint
+* [here](https://github.com/dexidp/dex/blob/master/examples/example-app/server/server.go#L76)
+### if you want to login | Dex, -- through the -- example app
+* follow steps
+#### "Login with Example"
+* you return the IDT token
+#### "Login with Email"
+* you return the IDT token

@@ -15,7 +15,8 @@ staticClients:
     redirectURIs:
       - 'http://127.0.0.1:5555/callback'
     name: 'Example App'
-    secret: mysecret
+    # REQUIRED this value to work "Login with Example" | built-in client
+    secret: ZXhhbXBsZS1hcHAtc2VjcmV0
 
 connectors:
   - type: mockCallback
@@ -26,6 +27,7 @@ enablePasswordDB: true
 
 staticPasswords:
   - email: "admin@example.com"
+    # password  == password
     hash: "$2a$10$2b2cU8CPhOTaGrs1HRQuAueS7JTT5ZHsHSzYiFPm1leZck7Mc8T4W"
     username: "admin"
     name: "Admin User"

@@ -73,20 +73,22 @@ type: "docs"
     * 's configuration's OAuth2 credentials
       * == [examples/config-dev.yaml](https://github.com/dexidp/dex/blob/master/examples/config-dev.yaml)'s credentials
     * if you want to run -> `./bin/example-app`
-      * query dex's [discovery endpoint](https://openid.net/specs/openid-connect-discovery-1_0-17.html#ProviderMetadata)
-      * determine the OAuth2 endpoints
+      * query Dex's [discovery endpoint](https://openid.net/specs/openid-connect-discovery-1_0-17.html#ProviderMetadata)
+        * == "*/.well-known/openid-configuration"
+        * Reason:🧠get the OAuth2 endpoints🧠
 
-TODO:
-Login to dex through the example app using the following steps.
-
-1. Navigate to the example app at http://localhost:5555/ in your browser.
-2. Hit "login" on the example app to be redirected to dex.
-3. Choose an option to authenticate:
-   - "Login with Example" to use mocked user data.
-   - "Login with Email" to fill the form with static user credentials `admin@example.com` and `password`.
-4. Approve the example app's request.
-5. See the resulting token the example app claims from dex.
-
-
-[gomplate]: https://github.com/hairyhenderson/gomplate
-[gomplate-docs]: https://docs.gomplate.ca/
+* if you want to login | Dex, -- through the -- example app
+  * steps
+    1. http://localhost:5555/
+    2. Click "Authorization Code Flow"
+       * Reason:be redirected -- to -- Dex
+    3. Choose an option to authenticate:
+       - "Login with Example"
+         - == use mocked user data
+       - "Login with Email"
+         - == fill the form -- with -- static user credentials
+           - `admin@example.com`
+           - `password`
+    4. Approve the example app's request
+    5. | Dex,
+       * see the resulting token
